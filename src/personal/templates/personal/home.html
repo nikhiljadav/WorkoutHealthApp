@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet" href="static\personal\css\baseStyle.css">
+{% endblock %}
+
+
+
+{% block content %}
+<div class="pricing-header p-3 pb-md-4 mx-auto text-center">
+    <h1 class="display-4 fw-normal text-body-emphasis">FitTracker</h1>
+    <p class="fs-5 text-body-secondary">The easiest and most efficient way to track your workouts and macro-nutrient intake!</p>
+</div>
+
+<div class="container">
+    <div class="d-flex flex-column"> <!-- flex box -->
+        <h4>Registered Users:</h4>
+        {% for account in accounts %}
+            <p>{{account.username}}</p>
+        {% endfor %}
+    </div>
+</div>
+
+
+
+<!--<div class="body">
+    {% for log in exerciseLogs %}
+        <h2>{{log.workout.name}} | ({{log.workout.date}})</h2>
+        {% include 'personal/snippets/body_snippet.html' with value=log %}
+    {% endfor %}
+</div>-->
+
+{% endblock content %}  

@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<style type="text/css">
+    html,
+    body {
+    height: 100%;
+    }
+
+    .form-signin {
+    max-width: 330px;
+    padding: 1rem;
+    }
+
+    .form-signin .form-floating:focus-within {
+    z-index: 2;
+    }
+
+    .form-signin input[type="email"] {
+    margin-bottom: -1px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    }
+
+    .form-signin input[type="password"] {
+    margin-bottom: 10px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    }
+
+    .h3{
+        text-align: center;
+    }
+
+</style>
+
+
+
+<form class="form-signin w-100 m-auto" method="post"> 
+    {% csrf_token %}
+    <h1 class="h3 mb-3 fw-normal">Sign in</h1>
+  
+        <input type="email" name="email" class="form-control" id="inputUsername" placeholder="name@example.com" autofocus>
+
+        <input type="password" name="password" class="form-control" id="inputPassword" placeholder="Password">
+  
+    <!-- errors printed here -->
+
+        
+    {% for field in login_form %}
+        <p>
+        {% for error in field.errors %}
+            <p style="color: grey;">{{error}}</p>
+        {% endfor %}
+        </p>
+    {% endfor %}
+    
+    {% if login_form.non_field_errors %}
+        <div style="color:red;">
+            <p>{{login_form.non_field_errors}}</p>
+        </div>
+    {% endif %}
+
+    <button class="btn btn-primary w-100 py-2" type="submit">Sign in</button>
+</form>
+
+  
+
+
+
+<!--<h2>Login</h2>
+<form method="post">
+      encryption token | security thing 
+
+    {% for field in login_form %}
+        <p>
+            {{field.label_tag}}
+            {{field}}
+
+            {% if field.help_text %}
+                <small style="color: grey;">{{field.help_text}}</small>
+            {% endif %}
+
+        </p>
+    {% endfor %}
+
+    {% for field in login_form %}
+        {% for error in field.errors %}
+            <p style="color: grey;">{{error}}</p>
+        {% endfor %}
+    {% endfor %}
+    
+    {% if login_form.non_field_errors %}
+        <div style="color:red;">
+            <p>{{login_form.non_field_errors}}</p>
+        </div>
+    {% endif %}
+
+    <button type="submit">Sign in</button>
+</form>-->
+
+
+{% endblock content %}

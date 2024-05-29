@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<style type="text/css">
+    html,
+    body {
+    height: 100%;
+    }
+
+    .form-signin {
+    max-width: 330px;
+    padding: 1rem;
+    }
+
+    .form-signin .form-floating:focus-within {
+    z-index: 2;
+    }
+
+    .form-signin input[type="email"] {
+    margin-bottom: 10px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    }
+
+    .form-signin input[type="username"] {
+    margin-bottom: 10px;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+    }
+
+    .form-signin input[type="password"] {
+    margin-bottom: -1px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    }
+
+    .h3{
+        text-align: center;
+    }
+
+</style>
+
+
+
+<form class="form-signin w-100 m-auto" method="post"> {% csrf_token %}
+    <h1 class="h3 mb-3 fw-normal">Register an account</h1>
+  
+        <input type="email" name="email" class="form-control" id="inputEmail" placeholder="Email Address" required autofocus>
+
+        <input type="text" name="username" class="form-control" id="inputUsername" placeholder="Username" required>
+
+        <input type="password" name="password1" class="form-control" id="inputPassword1" placeholder="Password" required>
+
+        <input type="password" name="password2" class="form-control" id="inputPassword2" placeholder="Confirm Password" required>
+
+  
+    <!-- errors printed here -->
+
+        
+    {% for field in registration_form %}
+        <p>
+        {% for error in field.errors %}
+            <p style="color: grey;">{{error}}</p>
+        {% endfor %}
+        </p>
+    {% endfor %}
+    
+    {% if registration_form.non_field_errors %}
+        <div style="color:red;">
+            <p>{{registration_form.non_field_errors}}</p>
+        </div>
+    {% endif %}
+
+    <button class="btn btn-primary w-100 py-2" type="submit">Register</button>
+</form>
+
+
+<!--<h2>Register Here</h2>
+<form method="post">
+    {% csrf_token %}
+
+    {% for field in registration_form %}
+        <p>
+            {{field.label_tag}}
+            {{field}}
+
+            {% if field.help_text %}
+                <small style="color: grey;">{{field.help_text}}</small>
+            {% endif %}
+
+            {% for error in field.errors %}
+                <p style="color: grey;">{{error}}</p>
+            {% endfor %}
+        </p>
+    {% endfor %}
+
+    <button type="submit">Register</button>
+</form>-->
+
+
+{% endblock content %}
