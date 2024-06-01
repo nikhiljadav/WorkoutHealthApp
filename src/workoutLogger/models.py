@@ -5,6 +5,7 @@ from django.conf import settings
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from account.models import Account
+from datetime import date
 
 
 
@@ -37,13 +38,13 @@ from account.models import Account
         
 # pre_save.connect(pre_save_blog_post_receiver, sender=BlogPost)
 
-def upload_location(instance, filename, **kwargs):
-    file_path = "workouts/{user-id}/{title}-{filename}".format(
+def upload_location(instance, filename):
+
+    file_path = 'workouts/{user_id}/{title}-{filename}'.format(
         user_id = str(instance.user.id),
         title = str(instance.title),
         filename=filename
     )
-    
     return file_path
 
 class presetExercise(models.Model):
@@ -63,6 +64,14 @@ class Workout(models.Model):
     
     def __str__(self):
         return f"{self.title} ({self.date})"
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            if not self.date:
+                self.date = date.today()
+            date_str = self.date.strftime("%Y-%m-%d")
+            self.slug = slugify(f"{self.title}-{date_str}")
+        super().save(*args, **kwargs)
     
 class Exercise(models.Model):
     workout                 = models.ForeignKey(Workout, related_name="exercises", on_delete=models.CASCADE)
@@ -87,12 +96,12 @@ def submission_delete(sender, instance, **kwargs):
     if instance.image:
         instance.image.delete(False)
 
-@receiver(pre_save, sender=Workout)
-def pre_save_workout_receiver(sender, instance, *args, **kwargs):
-    if not instance.slug:
-        instance.slug = slugify(instance.title + "-" + str(instance.date))
+# @receiver(pre_save, sender=Workout)
+# def pre_save_workout_receiver(sender, instance, *args, **kwargs):
+#     if not instance.slug:
+#         instance.slug = slugify(instance.title + "-" + str(instance.date))
         
-pre_save.connect(pre_save_workout_receiver, sender=Workout)
+# pre_save.connect(pre_save_workout_receiver, sender=Workout)
         
 @receiver(pre_save, sender=presetExercise)
 def pre_save_preset_exercise_receiver(sender, instance, *args, **kwargs):
