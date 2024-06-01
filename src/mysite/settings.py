@@ -38,7 +38,7 @@ if DEBUG:
 INSTALLED_APPS = [
 
     #my apps
-    'personal', 'account',
+    'personal', 'account', 'workoutLogger',
 
     #django apps
     'django.contrib.admin',

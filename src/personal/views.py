@@ -1,9 +1,4 @@
-from django.shortcuts import render
-from personal.models import Workout
-from personal.models import Exercise
-from personal.models import ExerciseLog
 from django.shortcuts import render, get_object_or_404
-from personal.forms import WorkoutSelectionForm
 from account.models import Account
 
 
