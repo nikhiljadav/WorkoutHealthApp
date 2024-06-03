@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style type="text/css">
+
+	@media (max-width: 768px) { 
+		.right-column{
+			margin-left: 0px;
+		}
+	}
+
+	@media (min-width: 768px) { 
+		.right-column{
+			margin-left: 20px;
+		}
+	}
+
+	.blog-post-container{
+		background-color: #fff;
+		margin-bottom: 20px;
+		width: 100%;
+	}
+	.create-post-bar{
+		background-color: #fff;
+		margin-bottom:20px;
+	}
+
+	.left-column{
+		padding:0px;
+	}
+
+	.right-column{
+		padding:0px;
+	}
+
+</style>
+
+<div class="container">
+    <div class="row">
+        <!-- Right 'Create Workout' Bar -->
+        <div class="create-post-bar d-lg-none col-lg-7 offset-lg-1">
+            <a href="{% url 'workoutLogger:createLog' %}">Start Workout</a>
+        </div>
+        <!-- End 'Create Workout' Bar -->
+
+        <!-- Body -->
+        <div class="left-column col-lg-7 offset-lg-1">
+            <div class="pricing-header p-3 pb-md-4 mx-auto text-center">
+                <h1 class="display-4 fw-normal text-body-emphasis">Workouts</h1>
+                <p class="fs-5 text-body-secondary">Start tracking your workouts here! You can also view your previous workouts.</p>
+            </div>
+        </div>
+        <!-- End Body-->
+
+        <!-- Right 'Create Workout' Column -->
+        <div class="right-column col-lg-3 d-lg-flex d-none flex-column">
+            <div class="create-post-bar">
+                <a href="{% url 'workoutLogger:createLog' %}">Start Workout</a>
+                <p>yap</p>
+                <p>yap</p>
+                <p>yap</p>
+                <p>yap</p>
+
+            </div>
+        </div>
+        <!-- End 'Create Workout' Column -->
+    </div>
+</div>
+
+
+
+{% endblock content %}
