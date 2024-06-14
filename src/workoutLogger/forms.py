@@ -1,6 +1,7 @@
 # forms.py
 from django import forms
-from .models import Set, Exercise
+from django.forms import inlineformset_factory
+from .models import Set, Exercise, Workout
 
 class SetForm(forms.ModelForm):
     class Meta:
@@ -10,4 +11,10 @@ class SetForm(forms.ModelForm):
 class ExerciseForm(forms.ModelForm):
     class Meta:
         model = Exercise
-        fields = ['preset_exercise']
+        fields = ['preset_exercise', 'order']
+        
+class WorkoutForm(forms.ModelForm):
+    class Meta:
+        model = Workout
+        fields = ['title', 'image']
+        

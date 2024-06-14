@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-<p>create workout</p>
+<h1>Log your workout here</h1>
+<form>
+    <h2>{{ workout_form }}</h2>
+    <h3>{{ exercise_form }}</h3>
+    <h5>{{ set_form }}</h5>
+</form>
 
 {% endblock content %}
