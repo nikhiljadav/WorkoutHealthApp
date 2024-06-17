@@ -49,6 +49,17 @@
             <div class="pricing-header p-3 pb-md-4 mx-auto text-center">
                 <h1 class="display-4 fw-normal text-body-emphasis">Workouts</h1>
                 <p class="fs-5 text-body-secondary">Start tracking your workouts here! You can also view your previous workouts.</p>
+                <p class="fs-5 text-body-secondary">
+                    {% for workout in workouts %}
+                        <strong> {{ workout.title }} </strong> - {{ workout.date }}
+                        {% for exercise in workout.exercises.all %}
+                            <strong> {{ exercise.preset_exercise.name }}</strong> (Order: {{ exercise.order }})
+                            {% for set in exercise.sets.all %}
+                                <li>{{ set.weight }} lbs x {{set.reps}} reps</li>
+                            {% endfor %}
+                        {% endfor %}
+                     {% endfor %}
+                </p>
             </div>
         </div>
         <!-- End Body-->
@@ -61,7 +72,6 @@
                 <p>yap</p>
                 <p>yap</p>
                 <p>yap</p>
-
             </div>
         </div>
         <!-- End 'Create Workout' Column -->

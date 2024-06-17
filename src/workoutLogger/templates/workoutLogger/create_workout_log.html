@@ -2,10 +2,33 @@
 
 {% block content %}
 <h1>Log your workout here</h1>
-<form>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
     <h2>{{ workout_form }}</h2>
     <h3>{{ exercise_form }}</h3>
-    <h5>{{ set_form }}</h5>
+    <div id="set-form-container" style="display:none;">
+        <h5>Sets</h5>
+        {{ set_formset.management_form }}
+        {% for form in set_formset %}
+            {{ form }}
+        {% endfor %}
+    <div>
+    <button type="submit">Save</button>
 </form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+        const exerciseSelect = document.querySelector('#id_exercise_form');
+        const setFormContainer = document.querySelector('#set-form-container');
+
+        exerciseSelect.addEventListener('change', function() {
+            if(this.value){
+                setFormContainer.style.display = 'block';
+            } else {
+                setFormContainer.style.display = 'none';
+            }
+        });
+    });
+</script>
 
 {% endblock content %}

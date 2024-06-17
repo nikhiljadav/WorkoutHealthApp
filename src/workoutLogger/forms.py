@@ -12,9 +12,14 @@ class ExerciseForm(forms.ModelForm):
     class Meta:
         model = Exercise
         fields = ['preset_exercise', 'order']
+        widgets = {
+            'preset_exercise': forms.Select(attrs={'id' : 'id_exercise_form'}),
+        }
         
 class WorkoutForm(forms.ModelForm):
     class Meta:
         model = Workout
         fields = ['title', 'image']
+
+SetFormSet = inlineformset_factory(Exercise, Set, form=SetForm, extra=1)
         
