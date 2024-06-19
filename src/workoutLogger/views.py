@@ -1,14 +1,15 @@
 from django.shortcuts import render, redirect
 from workoutLogger.forms import WorkoutForm, ExerciseForm, SetFormSet
 from account.models import Account
-from workoutLogger.models import Workout
+from workoutLogger.models import Workout, Exercise
+from django.contrib import messages
 # Create your views here.
 
 def workout_log_home(request):
     context = {}
-    workouts = Workout.objects.filter(request.USER)
+    workouts = Workout.objects.filter(user=request.user)
     context['workouts'] = workouts
-    return render(request, "workoutLogger/workout_log_home.html")
+    return render(request, "workoutLogger/workout_log_home.html", context)
 
 def create_workout_log(request):
     context = {}
@@ -26,7 +27,18 @@ def create_workout_log(request):
             set_formset = SetFormSet(request.POST, instance=exercise)
             if set_formset.is_valid():
                 set_formset.save()
-            return redirect('workoutLogger:workoutLogHome')
+                
+                if Workout.objects.filter(id=workout.id).exists() and Exercise.objects.filter(id=exercise.id).exists():
+                    messages.success(request, "W and E saved successfully")
+                else:
+                    messages.error(request, "error saving workout")
+        
+                return redirect('workoutLogger:workoutLogHome')
+            
+            else:
+                messages.error(request, "Invalid data in set formset")
+        else:
+            messages.error(request, "invalid workout or exercise form data")
     else:
         workout_form = WorkoutForm()
         exercise_form = ExerciseForm()
