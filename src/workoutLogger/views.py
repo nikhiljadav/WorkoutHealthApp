@@ -19,12 +19,12 @@ def create_workout_log(request):
         if workout_form.is_valid() and exercise_form.is_valid():
             workout = workout_form.save(commit=False)
             exercise = exercise_form.save(commit=False)
-            workout.user = request.user
-            workout.save()
-            exercise.workout = workout
+            workout.user = request.user                         #sets user for workout to the request's user
+            workout.save()                                      #saves workout
+            exercise.workout = workout                          #saves exercises workout field to current workout field
             exercise.save()
             
-            set_formset = SetFormSet(request.POST, instance=exercise)
+            set_formset = SetFormSet(request.POST, instance=exercise)   #set formset assigned to the exercise instance
             if set_formset.is_valid():
                 set_formset.save()
                 
@@ -47,15 +47,6 @@ def create_workout_log(request):
     context['workout_form'] = workout_form
     context['exercise_form'] = exercise_form
     context['set_formset'] = set_formset
-    # context = {}
-    # workout_form = WorkoutForm()
-    # exercise_form = ExerciseForm()
-    # set_form = SetForm()
-    # context['workout_form'] = workout_form
-    # context['exercise_form'] = exercise_form
-    # context['set_form'] = set_form
-    
-    
     
     return render(request, "workoutLogger/create_workout_log.html", context)
 
