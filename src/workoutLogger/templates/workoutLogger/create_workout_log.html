@@ -4,6 +4,118 @@
 <h1>Log your workout here</h1>
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
+    {{ workout_form.as_p }}
+    <div id="exercise-form-container">
+        {% for form in exercise_formset %}
+            <div class="exercise-form">
+                <div class="exercise-fields">
+                    {{ form.preset_exercise }}
+                    {{ form.order }}
+                </div>
+                <div class="set-forms">
+                    {% for set_form in form.sets %}
+                        <div class="set-form">
+                            <label>Set {{ forloop.counter }}</label>
+                            {{ set_form.as_p }}
+                        </div>
+                    {% endfor %}
+                </div>
+                <button type="button" class="add-set">Add Set</button>
+            </div>
+        {% endfor %}
+    </div>
+    <button type="button" id="add-exercise">Add Exercise</button>
+    <button type="submit">Save</button>
+</form>
+
+<!-- Hidden form template -->
+<div id="exercise-form-template" style="display: none;">
+    <div class="exercise-form">
+        <div class="exercise-fields">
+            {{ exercise_formset.empty_form.preset_exercise }}
+            {{ exercise_formset.empty_form.order }}
+        </div>
+        <div class="set-forms"></div>
+        <button type="button" class="add-set">Add Set</button>
+    </div>
+</div>
+
+<template id="set-form-template">
+    <div class="set-form">
+        <label>Set 1</label>
+        <input type="number" name="weight" value="0">
+        <input type="number" name="reps" value="0">
+    </div>
+</template>
+
+<style>
+    .exercise-fields {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const exerciseFormContainer = document.querySelector('#exercise-form-container');
+    const addExerciseButton = document.querySelector('#add-exercise');
+    const exerciseFormTemplate = document.querySelector('#exercise-form-template').firstElementChild;
+    const setFormTemplate = document.querySelector('#set-form-template').content;
+    let exerciseFormIndex = parseInt("{{ exercise_formset.total_form_count }}");
+
+    addExerciseButton.addEventListener('click', function() {
+        const newExerciseForm = exerciseFormTemplate.cloneNode(true);
+        const formRegex = RegExp(`form-(\\d){1}-`, 'g');
+        exerciseFormIndex++;
+        newExerciseForm.innerHTML = newExerciseForm.innerHTML.replace(formRegex, `form-${exerciseFormIndex}-`);
+        exerciseFormContainer.appendChild(newExerciseForm);
+
+        // Re-bind the Add Set button event for the new exercise form
+        const newExercise = exerciseFormContainer.lastElementChild;
+        bindAddSetEvent(newExercise.querySelector('.add-set'));
+        bindExerciseSelectEvent(newExercise.querySelector('.preset-exercise'));
+    });
+
+    document.querySelectorAll('.add-set').forEach(bindAddSetEvent);
+    document.querySelectorAll('.preset-exercise').forEach(bindExerciseSelectEvent);
+
+    function bindAddSetEvent(button) {
+        button.addEventListener('click', function() {
+            const setFormsContainer = this.previousElementSibling;
+            const totalForms = setFormsContainer.children.length;
+            const newSetForm = setFormTemplate.cloneNode(true);
+            newSetForm.querySelector('label').textContent = `Set ${totalForms + 1}`;
+            setFormsContainer.appendChild(newSetForm);
+        });
+    }
+
+    function bindExerciseSelectEvent(selectElement) {
+        selectElement.addEventListener('change', function() {
+            const setFormContainer = this.closest('.exercise-form').querySelector('.set-forms');
+            if (this.value) {
+                if (setFormContainer && setFormContainer.children.length === 0) {
+                    const newSetForm = setFormTemplate.cloneNode(true);
+                    newSetForm.querySelector('label').textContent = `Set 1`;
+                    setFormContainer.appendChild(newSetForm);
+                }
+                setFormContainer.style.display = 'block';
+            } else {
+                if (setFormContainer) {
+                    setFormContainer.style.display = 'none';
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}
+
+
+<!--
+<h1>Log your workout here</h1>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
     <h2>{{ workout_form }}</h2>
     <h3>{{ exercise_form }}</h3>
     <div id="set-form-container" style="display:none;">
@@ -68,6 +180,4 @@
         });
 
     });
-</script>
-
-{% endblock content %}
+</script> -->
