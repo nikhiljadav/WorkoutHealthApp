@@ -1,90 +1,51 @@
 from django.shortcuts import render, redirect
-from workoutLogger.forms import WorkoutForm, ExerciseFormSet, SetFormSet
 from account.models import Account
-from workoutLogger.models import Workout, Exercise
+from workoutLogger.models import Exercise, Set
+from django.forms import modelformset_factory
+from workoutLogger.forms import ExerciseForm, SetForm
 from django.contrib import messages
 # Create your views here.
 
 def workout_log_home(request):
-    context = {}
-    workouts = Workout.objects.filter(user=request.user)
-    context['workouts'] = workouts
+    exercises = Exercise.objects.filter(user=request.user).prefetch_related('sets')
+
+    if not exercises.exists():
+        messages.info(request, 'No exercises found. Start by logging your first workout!')
+    else:
+        print(f'Exercises: {exercises}')  # For debugging in the console
+
+    context = {
+        'exercises': exercises,
+    }
     return render(request, "workoutLogger/workout_log_home.html", context)
 
 def create_workout_log(request):
+    ExerciseFormSet = modelformset_factory(Set, form=SetForm, extra=1)  # Allow for adding multiple sets
     if request.method == 'POST':
-        workout_form = WorkoutForm(request.POST, request.FILES)
-        exercise_formset = ExerciseFormSet(request.POST, request.FILES)
+        exercise_form = ExerciseForm(request.POST)
+        formset = ExerciseFormSet(request.POST)
 
-        if workout_form.is_valid() and exercise_formset.is_valid():
-            workout = workout_form.save(commit=False)
-            workout.user = request.user
-            workout.save()
-
-            for exercise_form in exercise_formset:
-                if exercise_form.is_valid():
-                    exercise = exercise_form.save(commit=False)
-                    exercise.workout = workout
-                    exercise.save()
-
-                    set_formset = SetFormSet(request.POST, instance=exercise)
-                    if set_formset.is_valid():
-                        set_formset.save()
-                    else:
-                        messages.error(request, "Error saving sets")
-                        return redirect('workoutLogger:createLog')
-            messages.success(request, "Workout logged successfully")
+        if exercise_form.is_valid() and formset.is_valid():
+            exercise = exercise_form.save(commit=False)
+            exercise.user = request.user  # Set the user to the currently logged-in user
+            exercise.save()
+            sets = formset.save(commit=False)
+            for set_obj in sets:
+                set_obj.exercises = exercise
+                set_obj.save()
+            messages.success(request, 'Workout saved successfully!')
             return redirect('workoutLogger:workoutLogHome')
         else:
-            messages.error(request, "Invalid data in workout or exercise form")
-            return redirect('workoutLogger:createLog')
+            messages.error(request, 'There was an error saving your workout. Please try again.')
     else:
-        workout_form = WorkoutForm()
-        exercise_formset = ExerciseFormSet(queryset=Exercise.objects.none())
+        exercise_form = ExerciseForm()
+        formset = ExerciseFormSet(queryset=Set.objects.none())
 
     context = {
-        'workout_form': workout_form,
-        'exercise_formset': exercise_formset,
-        'set_formset': SetFormSet(),
+        'exercise_form': exercise_form,
+        'formset': formset,
     }
     return render(request, 'workoutLogger/create_workout_log.html', context)
-    # context = {}
-    # if request.method == "POST":
-    #     workout_form = WorkoutForm(request.POST, request.FILES)
-    #     exercise_form = ExerciseForm(request.POST)
-    #     if workout_form.is_valid() and exercise_form.is_valid():
-    #         workout = workout_form.save(commit=False)
-    #         exercise = exercise_form.save(commit=False)
-    #         workout.user = request.user                         #sets user for workout to the request's user
-    #         workout.save()                                      #saves workout
-    #         exercise.workout = workout                          #saves exercises workout field to current workout field
-    #         exercise.save()
-            
-    #         set_formset = SetFormSet(request.POST, instance=exercise)   #set formset assigned to the exercise instance
-    #         if set_formset.is_valid():
-    #             set_formset.save()
-                
-    #             if Workout.objects.filter(id=workout.id).exists() and Exercise.objects.filter(id=exercise.id).exists():
-    #                 messages.success(request, "W and E saved successfully")
-    #             else:
-    #                 messages.error(request, "error saving workout")
-        
-    #             return redirect('workoutLogger:workoutLogHome')
-            
-    #         else:
-    #             messages.error(request, "Invalid data in set formset")
-    #     else:
-    #         messages.error(request, "invalid workout or exercise form data")
-    # else:
-    #     workout_form = WorkoutForm()
-    #     exercise_form = ExerciseForm()
-    #     set_formset = SetFormSet()
-    
-    # context['workout_form'] = workout_form
-    # context['exercise_form'] = exercise_form
-    # context['set_formset'] = set_formset
-    
-    # return render(request, "workoutLogger/create_workout_log.html", context)
 
 def exercise_view(request):
     return render(request, "workoutLogger/exercises.html", {})

@@ -50,22 +50,20 @@
                 <h1 class="display-4 fw-normal text-body-emphasis">Workouts</h1>
                 <p class="fs-5 text-body-secondary">Start tracking your workouts here! You can also view your previous workouts.</p>
                 <p class="fs-5 text-body-secondary">
-                    {% if messages %}
-                        <ul class="messages">
-                            {% for message in messages %}
-                                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                    {% for workout in workouts %}
-                        <strong> {{ workout.title }} </strong> - {{ workout.date }}
-                        {% for exercise in workout.exercises.all %}
-                            <strong> {{ exercise.preset_exercise.name }}</strong> (Order: {{ exercise.order }})
+                      <h2>Your Workout Log</h2>
+                    
+                      {% for exercise in exercises %}
+                        <div class="exercise">
+                          <h3>{{ exercise.name }} ({{ exercise.get_type_display }})</h3>
+                          <ul>
                             {% for set in exercise.sets.all %}
-                                <li>{{ set.weight }} lbs x {{set.reps}} reps</li>
+                              <li>{{ set.weight }} lbs x {{ set.reps }} reps</li>
                             {% endfor %}
-                        {% endfor %}
-                     {% endfor %}
+                          </ul>
+                        </div>
+                      {% empty %}
+                        <p>No exercises found. Start by logging your first workout!</p>
+                      {% endfor %}
                 </p>
             </div>
         </div>

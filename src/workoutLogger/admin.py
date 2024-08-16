@@ -1,9 +1,7 @@
 from django.contrib import admin
 
-from workoutLogger.models import Workout, presetExercise, Exercise, Set
+from workoutLogger.models import Exercise, Set
 
-admin.site.register(Workout)
-admin.site.register(presetExercise)
 admin.site.register(Exercise)
 admin.site.register(Set)
 

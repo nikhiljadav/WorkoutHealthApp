@@ -1,183 +1,42 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Log your workout here</h1>
-<form method="post" enctype="multipart/form-data">
+  <h2>Create Workout Log</h2>
+  <form method="POST">
     {% csrf_token %}
-    {{ workout_form.as_p }}
-    <div id="exercise-form-container">
-        {% for form in exercise_formset %}
-            <div class="exercise-form">
-                <div class="exercise-fields">
-                    {{ form.preset_exercise }}
-                    {{ form.order }}
-                </div>
-                <div class="set-forms">
-                    {% for set_form in form.sets %}
-                        <div class="set-form">
-                            <label>Set {{ forloop.counter }}</label>
-                            {{ set_form.as_p }}
-                        </div>
-                    {% endfor %}
-                </div>
-                <button type="button" class="add-set">Add Set</button>
+    {{ exercise_form.as_p }}
+    
+    <h3>Sets</h3>
+    {{ formset.management_form }}
+    <div id="form-container">
+        {% for form in formset %}
+            <div class="formset">
+                {{ form.as_p }}
             </div>
         {% endfor %}
     </div>
-    <button type="button" id="add-exercise">Add Exercise</button>
-    <button type="submit">Save</button>
-</form>
 
-<!-- Hidden form template -->
-<div id="exercise-form-template" style="display: none;">
-    <div class="exercise-form">
-        <div class="exercise-fields">
-            {{ exercise_formset.empty_form.preset_exercise }}
-            {{ exercise_formset.empty_form.order }}
-        </div>
-        <div class="set-forms"></div>
-        <button type="button" class="add-set">Add Set</button>
+    <!-- Empty form template for cloning -->
+    <div class="formset-empty" style="display:none;">
+        {{ formset.empty_form.as_p }}
     </div>
-</div>
+    
+    <button type="button" id="add-set">Add Set</button>
+    <button type="submit">Save Workout</button>
+  </form>
 
-<template id="set-form-template">
-    <div class="set-form">
-        <label>Set 1</label>
-        <input type="number" name="weight" value="0">
-        <input type="number" name="reps" value="0">
-    </div>
-</template>
+  <script>
+    document.getElementById('add-set').addEventListener('click', function() {
+        const formContainer = document.getElementById('form-container');
+        const totalForms = document.getElementById('id_form-TOTAL_FORMS');
+        const currentFormCount = parseInt(totalForms.value);
+        const newForm = document.querySelector('.formset-empty').cloneNode(true);
 
-<style>
-    .exercise-fields {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-    }
-</style>
+        newForm.style.display = 'block';
+        newForm.innerHTML = newForm.innerHTML.replace(/__prefix__/g, currentFormCount);
+        formContainer.appendChild(newForm);
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const exerciseFormContainer = document.querySelector('#exercise-form-container');
-    const addExerciseButton = document.querySelector('#add-exercise');
-    const exerciseFormTemplate = document.querySelector('#exercise-form-template').firstElementChild;
-    const setFormTemplate = document.querySelector('#set-form-template').content;
-    let exerciseFormIndex = parseInt("{{ exercise_formset.total_form_count }}");
-
-    addExerciseButton.addEventListener('click', function() {
-        const newExerciseForm = exerciseFormTemplate.cloneNode(true);
-        const formRegex = RegExp(`form-(\\d){1}-`, 'g');
-        exerciseFormIndex++;
-        newExerciseForm.innerHTML = newExerciseForm.innerHTML.replace(formRegex, `form-${exerciseFormIndex}-`);
-        exerciseFormContainer.appendChild(newExerciseForm);
-
-        // Re-bind the Add Set button event for the new exercise form
-        const newExercise = exerciseFormContainer.lastElementChild;
-        bindAddSetEvent(newExercise.querySelector('.add-set'));
-        bindExerciseSelectEvent(newExercise.querySelector('.preset-exercise'));
+        totalForms.value = currentFormCount + 1;
     });
-
-    document.querySelectorAll('.add-set').forEach(bindAddSetEvent);
-    document.querySelectorAll('.preset-exercise').forEach(bindExerciseSelectEvent);
-
-    function bindAddSetEvent(button) {
-        button.addEventListener('click', function() {
-            const setFormsContainer = this.previousElementSibling;
-            const totalForms = setFormsContainer.children.length;
-            const newSetForm = setFormTemplate.cloneNode(true);
-            newSetForm.querySelector('label').textContent = `Set ${totalForms + 1}`;
-            setFormsContainer.appendChild(newSetForm);
-        });
-    }
-
-    function bindExerciseSelectEvent(selectElement) {
-        selectElement.addEventListener('change', function() {
-            const setFormContainer = this.closest('.exercise-form').querySelector('.set-forms');
-            if (this.value) {
-                if (setFormContainer && setFormContainer.children.length === 0) {
-                    const newSetForm = setFormTemplate.cloneNode(true);
-                    newSetForm.querySelector('label').textContent = `Set 1`;
-                    setFormContainer.appendChild(newSetForm);
-                }
-                setFormContainer.style.display = 'block';
-            } else {
-                if (setFormContainer) {
-                    setFormContainer.style.display = 'none';
-                }
-            }
-        });
-    }
-});
-</script>
+  </script>
 {% endblock %}
-
-
-<!--
-<h1>Log your workout here</h1>
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <h2>{{ workout_form }}</h2>
-    <h3>{{ exercise_form }}</h3>
-    <div id="set-form-container" style="display:none;">
-        <h5>Sets</h5>
-        {{ set_formset.management_form }}
-        <div id="set-forms">
-            {% for form in set_formset %}
-            <div class="set-form">
-                {{ form }}
-            </div>
-            {% endfor %}
-        </div>
-        <button type="button" id="add-set">Add Set</button>
-    </div>
-    <div>
-        <button type="submit">Save</button>
-    </div>
-</form>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function(){
-        const exerciseSelect = document.querySelector('#id_exercise_form');
-        const setFormContainer = document.querySelector('#set-form-container');
-        const setFormsDiv = document.querySelector('#set-forms');
-        const addSetButton = document.querySelector("#add-set");
-
-        console.log('DOM fully loaded and parsed');
-        console.log('Exercise Select:', exerciseSelect);
-        console.log('Set Form Container:', setFormContainer);
-        console.log('Add Set Button:', addSetButton);
-
-        exerciseSelect.addEventListener('change', function() {
-            console.log('Exercise selected:', this.value);
-            if(this.value){
-                setFormContainer.style.display = 'block';
-            } else {
-                setFormContainer.style.display = 'none';
-            }
-        });
-
-        addSetButton.addEventListener('click', function(){
-            console.log('Add Set button clicked');
-            const firstSetForm = setFormsDiv.querySelector('.set-form');
-            if(!firstSetForm){
-                console.error('No set form found to clone')
-                return;
-            }
-
-
-            const newForm = firstSetForm.cloneNode(true);
-            const totalForms = document.querySelector('#id_sets-TOTAL_FORMS');
-            const formCount = parseInt(totalForms.value);
-
-            console.log('Cloning form. Current form count:', formCount);
-
-            newForm.innerHTML = newForm.innerHTML.replace(/sets-\d+-/g, `sets-${formCount}-`);
-            setFormsDiv.appendChild(newForm);
-
-            totalForms.value = formCount+ 1;
-
-            console.log('New form added. Updated form count:', totalForms.value);
-        });
-
-    });
-</script> -->
