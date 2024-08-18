@@ -4,6 +4,7 @@ from workoutLogger.models import Exercise, Set
 from django.forms import modelformset_factory
 from workoutLogger.forms import ExerciseForm, SetForm
 from django.contrib import messages
+from .utils import calculate_recommended_weight
 # Create your views here.
 
 def workout_log_home(request):
@@ -13,6 +14,10 @@ def workout_log_home(request):
         messages.info(request, 'No exercises found. Start by logging your first workout!')
     else:
         print(f'Exercises: {exercises}')  # For debugging in the console
+
+    for exercise in exercises:
+        exercise.recWeight, recommendation = calculate_recommended_weight(exercise)
+        exercise.recommendation = recommendation
 
     context = {
         'exercises': exercises,

@@ -54,12 +54,14 @@
                     
                       {% for exercise in exercises %}
                         <div class="exercise">
-                          <h3>{{ exercise.name }} ({{ exercise.get_type_display }})</h3>
+                          <h4>{{ exercise.name }} ({{ exercise.get_type_display }}) - Rep Range: {{ exercise.lowerRange }} - {{ exercise.upperRange }}</h3>
                           <ul>
                             {% for set in exercise.sets.all %}
-                              <li>{{ set.weight }} lbs x {{ set.reps }} reps</li>
+                              <li>{{ set.weight }} lbs x {{ set.reps }} reps at RPE: {{ set.RPE }} </li>
                             {% endfor %}
                           </ul>
+                          <p>Recommended Weight for Next Session: {{ exercise.recWeight }} lbs</p>
+                          <p>{{ exercise.recommendation }}</p>
                         </div>
                       {% empty %}
                         <p>No exercises found. Start by logging your first workout!</p>
